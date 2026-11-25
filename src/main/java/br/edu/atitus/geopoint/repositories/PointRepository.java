@@ -79,4 +79,71 @@ public class PointRepository {
         }
     }
 
+    public boolean existsByName(String name) {
+        String sql = """
+        SELECT COUNT(*)
+        FROM points
+        WHERE name = ?
+        """;
+
+        Integer count = jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
+                name
+        );
+
+        return count != null && count > 0;
+    }
+
+    public boolean existsByNameAndNotId(String name, UUID id) {
+
+        String sql = """
+        SELECT COUNT(*)
+        FROM points
+        WHERE name = ?
+        AND id <> ?
+        """;
+
+        Integer count = jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
+                name,
+                id
+        );
+
+        return count != null && count > 0;
+    }
+
+    public PointEntity update(PointEntity point) {
+
+        String sql = """
+        UPDATE points
+        SET name = ?,
+            description = ?,
+            latitude = ?,
+            longitude = ?
+        WHERE id = ?
+        """;
+
+        jdbcTemplate.update(
+                sql,
+                point.getName(),
+                point.getDescription(),
+                point.getLatitude(),
+                point.getLongitude(),
+                point.getId()
+        );
+
+        return point;
+    }
+
+    public void delete(UUID id) {
+
+        String sql = """
+        DELETE FROM points
+        WHERE id = ?
+        """;
+
+        jdbcTemplate.update(sql, id);
+    }
 }
